@@ -4,7 +4,7 @@ package com.tencent.mars.xlog;
  * Created by joybar on 2019/1/14.
  */
 
- interface XLogService {
+interface XLogService {
 
 
 	void v(String tag, String filename, String funcName, int line, int pid, long tid, long mainThreadId, String msg);

@@ -2,6 +2,7 @@ package com.tencent.mars.xlog;
 
 import android.os.Looper;
 import android.os.Process;
+import android.text.TextUtils;
 
 /**
  * Created by joybar on 2019/1/11.
@@ -9,21 +10,33 @@ import android.os.Process;
 
 public class L {
 
+	/**
+	 * 初始化，请在使用之前调用L.init方法
+	 * 静态变量CONFIG_DEBUG_MODE：false模式下，只打印i 和 e，否则，全打印
+	 * 静态变量CONFIG_NEED_JUMP_SOURCE： true模式下，会自动console中自动加上跳转到代码的链接
+	 */
+
+	public static boolean CONFIG_DEBUG_MODE = true;
+	public static boolean CONFIG_NEED_JUMP_SOURCE = true;
+
 	private static Xlog xLog;
+	private static int LOG_TRACE_LEVEL = 4;
 
-	public static void init(String cacheDir, String logDir, String fName,String pubKey) {
+	/**
+	 *
+	 * @param cacheDir  this is necessary, or may crash for SIGBUS
+	 * @param logDir   log dir
+	 * @param LogFileName   log file name prefix
+	 * @param pubKey   如果为空，不会加密，否则，log会加密
+	 * @param consoleLogOpen 日志是否在控制台打印，建议debug模式置为true，release模式置为false
+	 */
+	public static void init(String cacheDir, String logDir, String LogFileName, String pubKey, boolean consoleLogOpen) {
 		if (null == xLog) {
 			xLog = new Xlog();
 		}
-		xLog.init(true, cacheDir, logDir, fName, pubKey);
+		xLog.init(consoleLogOpen, cacheDir, logDir, LogFileName, pubKey);
 	}
 
-	public static void init(String cacheDir, String logDir, String fName) {
-		if (null == xLog) {
-			xLog = new Xlog();
-		}
-		xLog.init(true, cacheDir, logDir, fName, "");
-	}
 
 	/**
 	 * 程序退出时反初始化
@@ -45,42 +58,64 @@ public class L {
 		}
 	}
 
+	/**
+	 *
+	 * @param level 参数定义见内部类Config
+	 */
 	public static void setLevel(final int level) {
 		if (xLog != null) {
 			xLog.setLogLevel(level);
 		}
 	}
 
-	public static void v(String tag, String message) {
-		if (xLog != null) {
-			xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
-		}
-	}
-
 	public static void i(String tag, String message) {
-		if (xLog != null) {
+		if (!TextUtils.isEmpty(message) && xLog != null) {
+			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
 			xLog.i(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
 		}
 	}
 
+
+	public static void v(String tag, String message) {
+		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
+			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
+			xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
+		}
+	}
+
+
 	public static void d(String tag, String message) {
-		if (xLog != null) {
+		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
+			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
 			xLog.d(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
 		}
 	}
 
 	public static void w(String tag, String message) {
-		if (xLog != null) {
+		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
+			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
 			xLog.w(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
 		}
 	}
 
 	public static void e(String tag, String message) {
-		if (xLog != null) {
+		if (!TextUtils.isEmpty(message) && xLog != null) {
+			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
 			xLog.e(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
 		}
 	}
 
+
+	private static String getAutoJumpLogInfos() {
+		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
+		if (elements.length >= 5) {
+			String s = "at " + elements[LOG_TRACE_LEVEL].getClassName() + "." + elements[LOG_TRACE_LEVEL].getMethodName() + "(" +
+					elements[LOG_TRACE_LEVEL].getClassName().substring(elements[LOG_TRACE_LEVEL].getClassName().lastIndexOf(".") + 1,
+							elements[LOG_TRACE_LEVEL].getClassName().length()) + ".java:" + elements[LOG_TRACE_LEVEL].getLineNumber() + ")";
+			return s;
+		}
+		return "";
+	}
 
 	public static class Config {
 
