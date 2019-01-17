@@ -68,6 +68,17 @@ public class L {
 		}
 	}
 
+	/**
+	 * 设置log保留时间，默认10天
+	 * @param aliveTime
+	 */
+	public void setLogMaxAliveTime(long aliveTime){
+		if (xLog != null) {
+			xLog.setMaxAliveTime(aliveTime);
+		}
+	}
+
+
 	public static void i(String tag, String message) {
 		if (!TextUtils.isEmpty(message) && xLog != null) {
 			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;

@@ -9,6 +9,8 @@ import com.tencent.utils.LogUtils;
 
 public class MainActivity extends AppCompatActivity {
 
+	private static String TAG = "MainActivity";
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -24,7 +26,7 @@ public class MainActivity extends AppCompatActivity {
 			@Override
 			public void run() {
 
-				writeLog1();
+				writeLog();
 			}
 		}, 2000);
 
@@ -38,13 +40,12 @@ public class MainActivity extends AppCompatActivity {
 
 	}
 
-
-	public void writeLog1() {
+	public void writeLog() {
 		for (int i = 0; i < 100; i++) {
-			L.i("MainActivity", "onCreate-----iiiiiii---" + i);
-			L.d("MainActivity", "onCreate----dddddd----" + i);
-			L.w("MainActivity", "onCreate----wwwwwww----" + i);
-			L.e("MainActivity", "onCreate-----eeeeeee--" + i);
+			L.i(TAG, "writeLog_info: " + i);
+			L.d(TAG, "writeLog_debug: " + i);
+			L.w(TAG, "writeLog_warning: " + i);
+			L.e(TAG, "writeLog_error: " + i);
 		}
 	}
 

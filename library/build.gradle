@@ -1,5 +1,6 @@
 apply plugin: 'com.android.library'
-
+apply plugin: 'com.github.dcendents.android-maven'
+apply plugin: 'com.jfrog.bintray'
 android {
     compileSdkVersion 26
 
@@ -27,8 +28,9 @@ android {
 
     sourceSets {
         main {
-           // jniLibs.srcDirs = ['src/main/libs', 'src/main/jniLibs']
-            jniLibs.srcDirs = ['libs']
+           jniLibs.srcDirs = ['src/main/jniLibs']
+           //jniLibs.srcDirs = ['src/main/libs', 'src/main/jniLibs']
+            //jniLibs.srcDirs = ['libs']
         }
     }
 
@@ -37,3 +39,4 @@ android {
 dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
 }
+apply from: 'push.gradle'
