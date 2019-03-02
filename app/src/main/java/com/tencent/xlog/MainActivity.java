@@ -15,12 +15,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-
-		L.init(LogUtils.LOG_CACHE_PATH, LogUtils.LOG_PATH, LogUtils.logFileName(), LogUtils.PUB_KEY, LogUtils.CONSOLE_LOG_OPEN);
-		L.setLevel(L.Config.kLevelVerbose);
-		//L.CONFIG_NEED_JUMP_SOURCE = com.tencent.mars.xlog.BuildConfig.DEBUG ? true : false;
-		L.CONFIG_NEED_JUMP_SOURCE = false;
-
+		L.init(LogUtils.LOG_CACHE_PATH, LogUtils.LOG_PATH, LogUtils.logFileName(), LogUtils.PUB_KEY, LogUtils.CONSOLE_LOG_OPEN,L.Config.LEVEL_INFO,true);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
@@ -42,8 +37,8 @@ public class MainActivity extends AppCompatActivity {
 
 	public void writeLog() {
 		for (int i = 0; i < 100; i++) {
-			L.i(TAG, "writeLog_info: " + i);
 			L.d(TAG, "writeLog_debug: " + i);
+			L.i(TAG, "writeLog_info: " + i);
 			L.w(TAG, "writeLog_warning: " + i);
 			L.e(TAG, "writeLog_error: " + i);
 		}

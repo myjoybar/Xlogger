@@ -41,7 +41,30 @@ L.e(TAG, "writeLog_error: " + i);
 L.appenderClose();
 
 ```
-#### 4. 其它使用方法详见demo注释
+
+#### 4. 混淆
+
+
+```java
+
+-keep class com.tencent.mars.** {
+  public protected private *;
+}
+
+```
+
+或者
+
+```java
+
+-keep class com.tencent.mars.xlog.** { *; }
+-keep class com.tencent.mars.comm.* { *; }
+-keep class com.tencent.mars.app.* { *; }
+-keep class com.tencent.mars.stn.* {*;}
+```
+
+
+#### 5. 其它使用方法详见demo注释
 
 ## License
 

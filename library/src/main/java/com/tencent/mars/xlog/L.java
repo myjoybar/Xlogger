@@ -10,31 +10,38 @@ import android.text.TextUtils;
 
 public class L {
 
-	/**
-	 * 初始化，请在使用之前调用L.init方法
-	 * 静态变量CONFIG_DEBUG_MODE：false模式下，只打印i 和 e，否则，全打印
-	 * 静态变量CONFIG_NEED_JUMP_SOURCE： true模式下，会自动console中自动加上跳转到代码的链接
-	 */
 
-	public static boolean CONFIG_DEBUG_MODE = true;
-	public static boolean CONFIG_NEED_JUMP_SOURCE = true;
+	private static boolean CONFIG_NEED_JUMP_SOURCE = true;
+	private static int CONFIG_LOG_LEVEL_CONTROL = 0;
+	private static int STACK_TRACE_LEVEL = 5;
+	private static final String AT = "at:";
+	private static final String LEFT_BRACKET = "(";
+	private static final String RIGHT_BRACKET = ")";
+	private static final String DOT = ".";
+	private static final String JAVA_FILE_NANE = ".java:";
+	private static final String UNDER_LINE = "_";
+
 
 	private static Xlog xLog;
-	private static int LOG_TRACE_LEVEL = 4;
 
 	/**
+	 * 初始化，请在使用之前调用L.init方法
 	 *
-	 * @param cacheDir  this is necessary, or may crash for SIGBUS
-	 * @param logDir   log dir
-	 * @param LogFileName   log file name prefix
-	 * @param pubKey   如果为空，不会加密，否则，log会加密
-	 * @param consoleLogOpen 日志是否在控制台打印，建议debug模式置为true，release模式置为false
+	 * @param cacheDir        this is necessary, or may crash for SIGBUS
+	 * @param logDir          log dir
+	 * @param LogFileName     log file name prefix
+	 * @param pubKey          如果为空，不会加密，否则，log会加密
+	 * @param consoleLogOpen  日志是否在控制台打印，建议debug模式置为true，release模式置为false
+	 * @param logLevelControl log等级，详见L.Config 定义, 0-6,0打印所有，6不会打印
 	 */
-	public static void init(String cacheDir, String logDir, String LogFileName, String pubKey, boolean consoleLogOpen) {
+	public static void init(String cacheDir, String logDir, String LogFileName, String pubKey, boolean consoleLogOpen, int logLevelControl,
+							boolean jumpToSource) {
 		if (null == xLog) {
 			xLog = new Xlog();
 		}
-		xLog.init(consoleLogOpen, cacheDir, logDir, LogFileName, pubKey);
+		CONFIG_NEED_JUMP_SOURCE = jumpToSource;
+		CONFIG_LOG_LEVEL_CONTROL = logLevelControl;
+		xLog.init(consoleLogOpen, logLevelControl, cacheDir, logDir, LogFileName, pubKey);
 	}
 
 
@@ -59,7 +66,6 @@ public class L {
 	}
 
 	/**
-	 *
 	 * @param level 参数定义见内部类Config
 	 */
 	public static void setLevel(final int level) {
@@ -70,74 +76,94 @@ public class L {
 
 	/**
 	 * 设置log保留时间，默认10天
+	 *
 	 * @param aliveTime
 	 */
-	public void setLogMaxAliveTime(long aliveTime){
+	public void setLogMaxAliveTime(long aliveTime) {
 		if (xLog != null) {
 			xLog.setMaxAliveTime(aliveTime);
 		}
 	}
 
 
-	public static void i(String tag, String message) {
-		if (!TextUtils.isEmpty(message) && xLog != null) {
-			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
-			xLog.i(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
-		}
-	}
-
-
 	public static void v(String tag, String message) {
-		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
-			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
-			xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
+		if (canPrintLog(Config.LEVEL_VERBOSE) && !TextUtils.isEmpty(message) && xLog != null) {
+			xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
 		}
 	}
 
 
 	public static void d(String tag, String message) {
-		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
-			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
-			xLog.d(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
+		if (canPrintLog(Config.LEVEL_DEBUG) && !TextUtils.isEmpty(message) && xLog != null) {
+			xLog.d(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
 		}
 	}
 
+	public static void i(String tag, String message) {
+		if (canPrintLog(Config.LEVEL_INFO) && !TextUtils.isEmpty(message) && xLog != null) {
+			xLog.i(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(),combineLogMsg(message));
+		}
+	}
+
+
 	public static void w(String tag, String message) {
-		if (CONFIG_DEBUG_MODE && !TextUtils.isEmpty(message) && xLog != null) {
-			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
-			xLog.w(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
+		if (canPrintLog(Config.LEVEL_WARN) && !TextUtils.isEmpty(message) && xLog != null) {
+			xLog.w(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
 		}
 	}
 
 	public static void e(String tag, String message) {
-		if (!TextUtils.isEmpty(message) && xLog != null) {
-			message = CONFIG_NEED_JUMP_SOURCE ? getAutoJumpLogInfos() + message : message;
-			xLog.e(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), message);
+		if (canPrintLog(Config.LEVEL_ERROR) && !TextUtils.isEmpty(message) && xLog != null) {
+			xLog.e(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
 		}
 	}
 
+	public static boolean canPrintLog(int currentLevel) {
+		return CONFIG_LOG_LEVEL_CONTROL <= currentLevel;
+	}
+
+	private static String combineLogMsg(String msg) {
+		StringBuilder sb = new StringBuilder();
+		sb.append(Thread.currentThread().getName()).append(UNDER_LINE);
+		if (CONFIG_NEED_JUMP_SOURCE) {
+			sb.append(getAutoJumpLogInfos());
+		}
+		sb.append(msg);
+		return sb.toString();
+
+	}
 
 	private static String getAutoJumpLogInfos() {
+		StringBuilder sb = new StringBuilder();
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		if (elements.length >= 5) {
-			String s = "at " + elements[LOG_TRACE_LEVEL].getClassName() + "." + elements[LOG_TRACE_LEVEL].getMethodName() + "(" +
-					elements[LOG_TRACE_LEVEL].getClassName().substring(elements[LOG_TRACE_LEVEL].getClassName().lastIndexOf(".") + 1,
-							elements[LOG_TRACE_LEVEL].getClassName().length()) + ".java:" + elements[LOG_TRACE_LEVEL].getLineNumber() + ")";
-			return s;
+
+
+//			String s =
+//					"at " + elements[STACK_TRACE_LEVEL].getClassName() + "." + elements[STACK_TRACE_LEVEL].getMethodName() + "(" +
+// elements[STACK_TRACE_LEVEL].getClassName().substring(elements[STACK_TRACE_LEVEL].getClassName().lastIndexOf(".") + 1,
+// elements[STACK_TRACE_LEVEL].getClassName().length()) + ".java:" + elements[STACK_TRACE_LEVEL].getLineNumber() + ")";
+
+			StackTraceElement stackTraceElement = elements[STACK_TRACE_LEVEL];
+			sb.append(AT).append(stackTraceElement.getClassName()).append(DOT).append(stackTraceElement.getMethodName()).append(LEFT_BRACKET).append(stackTraceElement.getClassName().substring(stackTraceElement.getClassName().lastIndexOf(".") + 1, stackTraceElement.getClassName().length())).append(JAVA_FILE_NANE).append(stackTraceElement.getLineNumber()).append(RIGHT_BRACKET);
+
+			return sb.toString();
 		}
 		return "";
 	}
 
 	public static class Config {
 
-		public static int kLevelAll = 0;
-		public static int kLevelVerbose = 0;
-		public static int kLevelDebug = 1;    // Detailed information on the flow through the system.
-		public static int kLevelInfo = 2;   // Interesting runtime events (startup/shutdown), should be conservative and keep to a minimum.
-		public static int kLevelWarn = 3;    // Other runtime situations that are undesirable or unexpected, but not necessarily "wrong".
-		public static int kLevelError = 4;    // Other runtime errors or unexpected conditions.
-		public static int kLevelFatal = 5;   // Severe errors that cause premature termination.
-		public static int kLevelNone = 6;   // Special level used to disable all log messages.
+
+		public static int LEVEL_ALL = 0;
+		public static int LEVEL_VERBOSE = 0;
+		public static int LEVEL_DEBUG = 1;    // Detailed information on the flow through the system.
+		public static int LEVEL_INFO = 2;   // Interesting runtime events (startup/shutdown), should be conservative and keep to a minimum.
+		public static int LEVEL_WARN = 3;    // Other runtime situations that are undesirable or unexpected, but not necessarily "wrong".
+		public static int LEVEL_ERROR = 4;    // Other runtime errors or unexpected conditions.
+
+		public static int LEVEL_FATAL = 5;   // Severe errors that cause premature termination.
+		public static int LEVEL_NONE = 6;   // Special level used to disable all log messages.
 
 
 		public static final int AppednerModeAsync = 0;
