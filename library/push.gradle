@@ -4,7 +4,7 @@ apply plugin: 'com.jfrog.bintray'
 def siteUrl = 'https://github.com/myjoybar/Xlogger'
 def gitUrl = 'https://github.com/myjoybar/Xlogger.git'
 group = "com.joybar.xlog"
-version = "1.0.1"
+version = "1.0.4"
 
 install {
     repositories.mavenInstaller {

@@ -15,7 +15,7 @@ public class MainActivity extends AppCompatActivity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
-		L.init(LogUtils.LOG_CACHE_PATH, LogUtils.LOG_PATH, LogUtils.logFileName(), LogUtils.PUB_KEY, LogUtils.CONSOLE_LOG_OPEN,L.Config.LEVEL_INFO,true);
+		Xlog.init(LogUtils.LOG_CACHE_PATH, LogUtils.LOG_PATH, LogUtils.logFileName(), LogUtils.PUB_KEY, LogUtils.CONSOLE_LOG_OPEN, Xlog.Config.LEVEL_INFO,true);
 		new Handler().postDelayed(new Runnable() {
 
 			@Override
@@ -37,10 +37,10 @@ public class MainActivity extends AppCompatActivity {
 
 	public void writeLog() {
 		for (int i = 0; i < 100; i++) {
-			L.d(TAG, "writeLog_debug: " + i);
-			L.i(TAG, "writeLog_info: " + i);
-			L.w(TAG, "writeLog_warning: " + i);
-			L.e(TAG, "writeLog_error: " + i);
+			Xlog.d(TAG, "writeLog_debug: " + i);
+			Xlog.i(TAG, "writeLog_info: " + i);
+			Xlog.w(TAG, "writeLog_warning: " + i);
+			Xlog.e(TAG, "writeLog_error: " + i);
 		}
 	}
 
@@ -48,6 +48,6 @@ public class MainActivity extends AppCompatActivity {
 	@Override
 	protected void onDestroy() {
 		super.onDestroy();
-		L.appenderClose();
+		Xlog.appenderClose();
 	}
 }

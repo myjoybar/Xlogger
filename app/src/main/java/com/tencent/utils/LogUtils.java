@@ -5,7 +5,7 @@ import android.os.AsyncTask;
 import android.os.Environment;
 
 import com.tencent.mars.xlog.BuildConfig;
-import com.tencent.mars.xlog.L;
+import com.tencent.mars.xlog.Xlog;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -160,7 +160,7 @@ public class LogUtils {
 			zout.close();
 
 		} catch (IOException ioe) {
-			L.e(tag, ioe.getStackTrace().toString());
+			Xlog.e(tag, ioe.getStackTrace().toString());
 		} finally {
 			if (zout != null) {
 				try {
