@@ -11,7 +11,7 @@
 #####   Add the library to your project build.gradle
 
 ```gradle
-compile 'com.joybar.xlog:library:1.0.0'
+compile 'com.joybar.xlog:library:1.0.5'
 
 ```
 
