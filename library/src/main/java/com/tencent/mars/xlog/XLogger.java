@@ -1,7 +1,5 @@
 package com.tencent.mars.xlog;
 
-import android.os.Looper;
-import android.os.Process;
 import android.text.TextUtils;
 
 /**
@@ -20,6 +18,7 @@ public class XLogger {
 	private static final String DOT = ".";
 	private static final String JAVA_FILE_NANE = ".java:";
 	private static final String UNDER_LINE = "_";
+	private static final String COLON = ":";
 
 
 	private static Xlog xLog;
@@ -91,33 +90,34 @@ public class XLogger {
 
 	public static void v(String tag, String message) {
 		if (canPrintLog(Config.LEVEL_VERBOSE) && !TextUtils.isEmpty(message) && xLog != null) {
-			xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
+			//xLog.v(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
+			xLog.v(tag, "", "", 0, 0,0,0, combineLogMsg(message));
 		}
 	}
 
 
 	public static void d(String tag, String message) {
 		if (canPrintLog(Config.LEVEL_DEBUG) && !TextUtils.isEmpty(message) && xLog != null) {
-			xLog.d(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
+			xLog.d(tag, "", "", 0, 0,0, 0, combineLogMsg(message));
 		}
 	}
 
 	public static void i(String tag, String message) {
 		if (canPrintLog(Config.LEVEL_INFO) && !TextUtils.isEmpty(message) && xLog != null) {
-			xLog.i(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(),combineLogMsg(message));
+			xLog.i(tag, "", "", 0, 0,0, 0,combineLogMsg(message));
 		}
 	}
 
 
 	public static void w(String tag, String message) {
 		if (canPrintLog(Config.LEVEL_WARN) && !TextUtils.isEmpty(message) && xLog != null) {
-			xLog.w(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
+			xLog.w(tag, "", "", 0, 0, 0, 0, combineLogMsg(message));
 		}
 	}
 
 	public static void e(String tag, String message) {
 		if (canPrintLog(Config.LEVEL_ERROR) && !TextUtils.isEmpty(message) && xLog != null) {
-			xLog.e(tag, "", "", 0, Process.myPid(), Thread.currentThread().getId(), Looper.getMainLooper().getThread().getId(), combineLogMsg(message));
+			xLog.e(tag, "", "", 0, 0, 0, 0, combineLogMsg(message));
 		}
 	}
 
@@ -141,14 +141,14 @@ public class XLogger {
 		StackTraceElement[] elements = Thread.currentThread().getStackTrace();
 		if (elements.length >= 5) {
 
-
-//			String s =
-//					"at " + elements[STACK_TRACE_LEVEL].getClassName() + "." + elements[STACK_TRACE_LEVEL].getMethodName() + "(" +
-// elements[STACK_TRACE_LEVEL].getClassName().substring(elements[STACK_TRACE_LEVEL].getClassName().lastIndexOf(".") + 1,
-// elements[STACK_TRACE_LEVEL].getClassName().length()) + ".java:" + elements[STACK_TRACE_LEVEL].getLineNumber() + ")";
-
 			StackTraceElement stackTraceElement = elements[STACK_TRACE_LEVEL];
-			sb.append(AT).append(stackTraceElement.getClassName()).append(DOT).append(stackTraceElement.getMethodName()).append(LEFT_BRACKET).append(stackTraceElement.getClassName().substring(stackTraceElement.getClassName().lastIndexOf(".") + 1, stackTraceElement.getClassName().length())).append(JAVA_FILE_NANE).append(stackTraceElement.getLineNumber()).append(RIGHT_BRACKET);
+			sb.append(AT).append(stackTraceElement.getClassName()).append(DOT)
+					.append(stackTraceElement.getMethodName())
+					.append(LEFT_BRACKET)
+					.append(stackTraceElement.getFileName())
+					.append(COLON)
+					.append(stackTraceElement.getLineNumber())
+					.append(RIGHT_BRACKET);
 
 			return sb.toString();
 		}
