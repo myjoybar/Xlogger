@@ -1,7 +1,7 @@
 # Xlogger
 #### 1. 下载源码：git clone https://github.com/Tencent/mars.git
 #### 2. 构建本地cmake version 3.13.2和android-ndk-r16b本地环境
-#### 3. 编译 进入源码目录 python build_android.py（cd /Users/joybar/Documents/WorkSpaces/Xlog2/mars/mars）
+#### 3. 编译 进入源码目录 python build_android.py armeabi-v7a（cd /Users/joybar/Documents/WorkSpaces/Xlog2/mars/mars）
 #### 4. 修改console和日志文件的输出格式：（ConsoleLog.cc formater.cc）
 #### 5. 混淆
 

@@ -3,15 +3,20 @@
 ## Features
  - 低内存、低CPU：性能优势大，不占内存CPU
  - 功能丰富：与原生Log使用几乎一致，但增加了写入文件功能，同时自带加密
+ - 支持点击log跳转到源码位置
+ - 目前编译了armeabi-v7和arm64-v8a
 
-   
+## 日志显示截图：
+
+ ![image](https://github.com/myjoybar/Xlogger/blob/master/screenshots/log.png) 
+
 ## Installation
 ### Gradle Dependency
 
 #####   Add the library to your project build.gradle
 
 ```gradle
-compile 'com.joybar.xlog:library:1.0.6'
+compile 'com.joybar.xlog:library:1.0.7'
 
 ```
 
